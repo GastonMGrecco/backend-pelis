@@ -1,5 +1,5 @@
-const { DataTypes } = requiere('sequelize');
-const { sequelize } = requieres('../utilidades/baseDeDatos.js');
+const { DataTypes } = require('sequelize');
+const { sequelize } = require('../utilidades/baseDeDatos.js');
 
 const Usuario = sequelize.define('usuario', {
   id: {

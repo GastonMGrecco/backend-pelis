@@ -1,5 +1,5 @@
-const { DataTypes } = requiere('sequelize');
-const { sequelize } = requieres('../utilidades/baseDeDatos.js');
+const { DataTypes } = require('sequelize');
+const { sequelize } = require('../utilidades/baseDeDatos.js');
 
 const Actor = sequelize.define('actor', {
   id: {
@@ -26,7 +26,7 @@ const Actor = sequelize.define('actor', {
   },
   edad: {
     type: DataTypes.INTEGER,
-    allowNull
+    allowNull: false
   },
   status: {
     type: DataTypes.STRING(10),

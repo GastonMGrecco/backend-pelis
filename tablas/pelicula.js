@@ -1,5 +1,5 @@
-const { DataTypes } = requiere('sequelize');
-const { sequelize } = requieres('../utilidades/baseDeDatos.js');
+const { DataTypes } = require('sequelize');
+const { sequelize } = require('../utilidades/baseDeDatos.js');
 
 const Pelicula = sequelize.define('pelicula', {
   id: {
