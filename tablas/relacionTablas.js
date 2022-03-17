@@ -11,8 +11,8 @@ const Relaciones = () => {
   Pelicula.hasMany(Comentario);
   Comentario.belongsTo(Pelicula);
 
-  ActorEnPeli.hasMany(Actor);
+  Pelicula.belongsToMany(Actor, { through: ActorEnPeli });
 
-  ActorEnPeli.hasMany(Pelicula);
+  Actor.belongsToMany(Pelicula, { through: ActorEnPeli });
 };
 module.exports = { Relaciones };
