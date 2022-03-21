@@ -16,17 +16,17 @@ const Usuario = sequelize.define('usuario', {
     type: DataTypes.STRING(50),
     allowNull: false
   },
-  password: {
+  contrasena: {
     type: DataTypes.STRING(100),
     allowNull: false
   },
-  roll: {
+  permisos: {
     type: DataTypes.STRING(20),
     allowNull: false
   },
   status: {
     type: DataTypes.STRING(10),
-    defaultValue: 'active',
+    defaultValue: 'activo',
     allowNull: false
   }
 });

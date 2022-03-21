@@ -14,9 +14,10 @@ const Pelicula = sequelize.define('pelicula', {
   },
   puntuacion: {
     type: DataTypes.INTEGER,
-    allowNull: false
+    allowNull: false,
+    defaultValue: 0
   },
-  descripcion: {
+  resena: {
     type: DataTypes.STRING(250),
     allowNull: false
   },
@@ -25,12 +26,12 @@ const Pelicula = sequelize.define('pelicula', {
     allowNull: false
   },
   genero: {
-    type: DataTypes.STRING(10),
+    type: DataTypes.STRING(20),
     allowNull: false
   },
   status: {
     type: DataTypes.STRING(10),
-    defaultValue: 'active',
+    defaultValue: 'activo',
     allowNull: false
   }
 });

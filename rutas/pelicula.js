@@ -2,12 +2,15 @@ const express = require('express');
 const ruta = express.Router();
 const {
   obtenerPeliculas,
+  obtenerPeliculaUnica,
   crearPelicula,
   modificarPelicula,
   eliminarPelicula
 } = require('../controladores/pelicula');
 
 ruta.get('/', obtenerPeliculas);
+
+ruta.get('/:id', obtenerPeliculaUnica);
 
 ruta.post('/', crearPelicula);
 

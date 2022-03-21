@@ -14,7 +14,8 @@ const Comentario = sequelize.define('comentario', {
   },
   puntuacion: {
     type: DataTypes.INTEGER,
-    allowNull: false
+    allowNull: false,
+    defaultValue: 0
   },
   comentario: {
     type: DataTypes.STRING(250),
@@ -30,7 +31,7 @@ const Comentario = sequelize.define('comentario', {
   },
   status: {
     type: DataTypes.STRING(10),
-    defaultValue: 'active',
+    defaultValue: 'activo',
     allowNull: false
   }
 });

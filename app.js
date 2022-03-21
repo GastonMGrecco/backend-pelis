@@ -7,8 +7,8 @@ const app = express();
 
 app.use(express.json());
 
-app.use('api/v1/actor', rutasActor);
-app.use('api/v1/pelicula', rutasPelicula);
-app.use('api/v1/usuario', rutasUsuario);
+app.use('/api/v1/actor', rutasActor);
+app.use('/api/v1/pelicula', rutasPelicula);
+app.use('/api/v1/usuario', rutasUsuario);
 
 module.exports = { app };
