@@ -1,4 +1,5 @@
 const express = require('express');
+const { validarSesion } = require('../utilidades/autSesion');
 const ruta = express.Router();
 const {
   obtenerUsuarios,
@@ -8,6 +9,8 @@ const {
   modificarUsuario,
   eliminarUsuario
 } = require('../controladores/usuario');
+
+ruta.use(validarSesion);
 
 ruta.get('/', obtenerUsuarios);
 

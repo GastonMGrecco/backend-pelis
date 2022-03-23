@@ -62,7 +62,7 @@ exports.ingresarUsuario = recibirAsinc(async (req, res, next) => {
   const { email, contrasena } = req.body;
   const usuario = await Usuario.findOne({ where: { email, status: 'activo' } });
   if (!usuario || !(await bcrypt.compare(contrasena, usuario.contrasena))) {
-    return next(AppError(400, 'E-mail o contraseña incorrectos'));
+    return next(new AppError(400, 'E-mail o contraseña incorrectos'));
   }
   const token = await jwt.sign({ id: usuario.id }, process.env.JWT_SECRET, {
     expiresIn: process.env.JWT_EXPIRES_IN
