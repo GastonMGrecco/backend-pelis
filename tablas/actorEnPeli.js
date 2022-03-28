@@ -12,8 +12,13 @@ const ActorEnPeli = sequelize.define('actorenpeli', {
     type: DataTypes.INTEGER,
     allowNull: false
   },
-  peliId: {
+  peliculaId: {
     type: DataTypes.INTEGER,
+    allowNull: false
+  },
+  status: {
+    type: DataTypes.STRING(10),
+    defaultValue: 'activo',
     allowNull: false
   }
 });

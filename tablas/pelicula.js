@@ -17,6 +17,10 @@ const Pelicula = sequelize.define('pelicula', {
     allowNull: false,
     defaultValue: 0
   },
+  imagen: {
+    type: DataTypes.STRING(100),
+    allowNull: false
+  },
   resena: {
     type: DataTypes.STRING(250),
     allowNull: false

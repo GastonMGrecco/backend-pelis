@@ -43,3 +43,10 @@ exports.validarSesion = recibirAsinc(async (req, res, next) => {
 
   next();
 });
+
+exports.usuarioAdministrador = recibirAsinc(async (req, res, next) => {
+  if (req.usuarioActual.permisos !== 'administrador') {
+    return next(new AppError(401, 'No cuentas con los permisos necesarios'));
+  }
+  next();
+});

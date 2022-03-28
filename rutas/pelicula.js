@@ -1,5 +1,7 @@
 const express = require('express');
 const ruta = express.Router();
+const { validarSesion } = require('../utilidades/autSesion');
+const {usuarioAdministrador}= require('../utilidades/autSesion');
 const {
   obtenerPeliculas,
   obtenerPeliculaUnica,
@@ -7,12 +9,17 @@ const {
   modificarPelicula,
   eliminarPelicula
 } = require('../controladores/pelicula');
+const { imagenCargada } = require('../utilidades/multer');
 
 ruta.get('/', obtenerPeliculas);
 
 ruta.get('/:id', obtenerPeliculaUnica);
 
-ruta.post('/', crearPelicula);
+ruta.use(validarSesion);
+
+ruta.use(usuarioAdministrador);
+
+ruta.post('/', imagenCargada.single('imagen'), crearPelicula);
 
 ruta.patch('/:id', modificarPelicula);
 

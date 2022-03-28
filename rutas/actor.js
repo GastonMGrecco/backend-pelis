@@ -1,5 +1,7 @@
 const express = require('express');
 const ruta = express.Router();
+const { validarSesion } = require('../utilidades/autSesion');
+const {usuarioAdministrador}= require('../utilidades/autSesion');
 const {
   obtenerActores,
   obtenerActorUnico,
@@ -7,12 +9,18 @@ const {
   modificarActor,
   eliminarActor
 } = require('../controladores/actor');
+const { imagenCargada } = require('../utilidades/multer');
 
 ruta.get('/', obtenerActores);
 
 ruta.get('/:id', obtenerActorUnico);
 
-ruta.post('/', crearActor);
+ruta.use(validarSesion);
+
+ruta.use(usuarioAdministrador);
+
+
+ruta.post('/', imagenCargada.single('imagen'), crearActor);
 
 ruta.patch('/:id', modificarActor);
 

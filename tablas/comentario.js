@@ -21,11 +21,11 @@ const Comentario = sequelize.define('comentario', {
     type: DataTypes.STRING(250),
     allowNull: false
   },
-  userId: {
+  usuarioId: {
     type: DataTypes.INTEGER,
     allowNull: false
   },
-  peliId: {
+  peliculaId: {
     type: DataTypes.INTEGER,
     allowNull: false
   },

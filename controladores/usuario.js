@@ -1,4 +1,5 @@
 const { Usuario } = require('../tablas/usuario');
+const { Comentario } = require('../tablas/comentario');
 const { recibirAsinc } = require('../utilidades/recibirAsinc');
 const bcrypt = require('bcryptjs');
 const jwt = require('jsonwebtoken');
@@ -10,7 +11,7 @@ dotenv.config({ path: './config.env' });
 exports.obtenerUsuarios = recibirAsinc(async (req, res, next) => {
   const usuarios = await Usuario.findAll({
     where: { status: 'activo' },
-    attributes: { exclude: ['contrasena'] }
+    attributes: { exclude: ['contrasena'] },include:{model: Comentario}
   });
 
   res.status(200).json({
@@ -23,7 +24,7 @@ exports.obtenerUsuarioUnico = recibirAsinc(async (req, res, next) => {
   const { id } = req.params;
   const usuario = await Usuario.findOne({
     where: { status: 'activo', id },
-    attributes: { exclude: ['contrasena'] }
+    attributes: { exclude: ['contrasena'] },include:{model: Comentario}
   });
   if (!usuario) {
     return next(
