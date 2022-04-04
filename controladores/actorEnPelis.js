@@ -1,13 +1,12 @@
 const { Comentario } = require('../tablas/comentario');
-const { Pelicula } = require('../tablas/pelicula');
-const { Usuario } = require('../tablas/usuario');
 const { ActorEnPeli } = require('../tablas/actorEnPeli');
 const { recibirAsinc } = require('../utilidades/recibirAsinc');
 const { AppError } = require('../utilidades/appError');
 
-
 exports.obtenerActorEnPelis = recibirAsinc(async (req, res, next) => {
-  const ActorEnPelis = await ActorEnPeli.findAll({where:{status:'activo'}});
+  const ActorEnPelis = await ActorEnPeli.findAll({
+    where: { status: 'activo' }
+  });
   res.status(200).json({
     status: 'operación exitosa',
     data: ActorEnPelis
@@ -15,63 +14,61 @@ exports.obtenerActorEnPelis = recibirAsinc(async (req, res, next) => {
 });
 
 exports.crearActorEnPeli = recibirAsinc(async (req, res, next) => {
-  const { actorId,peliculaId } = req.body;
-  if (!actorId||!peliculaId) {
-    return next(
-      new AppError(
-        400,
-        'Prueba con un nombre,nacionalidad,imagen,genero o edad valido'
-      )
-    );
+  const { actorId, peliculaId } = req.body;
+  if (!actorId || !peliculaId) {
+    return next(new AppError(400, 'Ingresa un actorId o peliculaId validos'));
   }
 
-  const actorEnPeliNuevo = ActorEnPeli.create({
-    actorId,peliculaId
+  const actorEnPeliNuevo = await ActorEnPeli.create({
+    actorId,
+    peliculaId
   });
   res.status(201).json({
-    status: 'Comentario creado',
-    data:  actorEnPeliNuevo 
+    status: 'Relacion creada',
+    data: actorEnPeliNuevo
   });
 });
 
 exports.modificarActorEnPeli = recibirAsinc(async (req, res, next) => {
   const { id } = req.params;
-  const { titulo, puntuacion, comentario } = req.body;
-  const comentarioModificado = { titulo, puntuacion, comentario  };
+  const { actorId, peliculaId } = req.body;
+  const relacionModificada = { actorId, peliculaId };
 
-  const comentarioHecho = await Comentario.findOne({ whrere: { status: 'activo', id } });
-  if (!comentario) {
+  const relacion = await Comentario.findOne({
+    whrere: { status: 'activo', id }
+  });
+  if (!relacion) {
     res.status(400).json({
       status: 'Error',
-      message: 'El comentario no se encuentra en la base de datos'
+      message: 'La relacion no se encuentra en la base de datos'
     });
   }
 
-  await comentarioHecho.update({ ...comentarioModificado });
+  await relacion.update({ ...relacionModificada });
   res.status(200).json({
     status: 'Operación exitosa',
-    message: 'El comentario fue modificado exitosamente'
+    message: 'La relacion fue modificada exitosamente'
   });
 });
 
 exports.eliminarActorEnPeli = recibirAsinc(async (req, res, next) => {
   const { id } = req.params;
 
-  const comentarioAEliminar = await Comentario.findOne({
+  const relacionAEliminar = await Comentario.findOne({
     where: { status: 'activo', id }
   });
 
-  if (!comentarioAEliminar) {
+  if (!relacionAEliminar) {
     res.status(400).json({
       status: 'Error',
-      message: 'El comentario no existe en la base de datos'
+      message: 'La relacion no existe en la base de datos'
     });
   }
 
-  await comentarioAEliminar.update({ status: 'eliminado' });
+  await relacionAEliminar.update({ status: 'eliminado' });
 
   res.status(200).json({
     status: 'Operación exitosa',
-    message: 'El comentario fue eliminado exitosamente'
+    message: 'La relacion fue eliminada exitosamente'
   });
 });

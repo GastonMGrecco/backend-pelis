@@ -1,7 +1,12 @@
 const express = require('express');
 const ruta = express.Router();
 const { validarSesion } = require('../utilidades/autSesion');
-const {usuarioAdministrador}= require('../utilidades/autSesion');
+const { usuarioAdministrador } = require('../utilidades/autSesion');
+const {
+  crearActorV,
+  validacionesResult,
+  modificarActorV
+} = require('../utilidades/validaciones');
 const {
   obtenerActores,
   obtenerActorUnico,
@@ -19,10 +24,21 @@ ruta.use(validarSesion);
 
 ruta.use(usuarioAdministrador);
 
+ruta.post(
+  '/',
+  crearActorV,
+  validacionesResult,
+  imagenCargada.single('imagen'),
+  crearActor
+);
 
-ruta.post('/', imagenCargada.single('imagen'), crearActor);
-
-ruta.patch('/:id', modificarActor);
+ruta.patch(
+  '/:id',
+  modificarActorV,
+  validacionesResult,
+  imagenCargada.single('imagen'),
+  modificarActor
+);
 
 ruta.delete('/:id', eliminarActor);
 

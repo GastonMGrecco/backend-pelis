@@ -15,6 +15,7 @@ exports.obtenerPeliculas = recibirAsinc(async (req, res, next) => {
 
   const peliculasPromesa = peliculas.map(
     async ({
+      id,
       titulo,
       puntuacion,
       imagen,
@@ -31,6 +32,7 @@ exports.obtenerPeliculas = recibirAsinc(async (req, res, next) => {
       const direccionUrlImagen = await getDownloadURL(imagenRef);
 
       return {
+        id,
         titulo,
         puntuacion,
         imagen: direccionUrlImagen,
@@ -61,7 +63,10 @@ exports.obtenerPeliculaUnica = recibirAsinc(async (req, res, next) => {
 
   if (!pelicula) {
     return next(
-      new AppError(400, 'Puede que el usuario no exista o halla sido eliminado')
+      new AppError(
+        400,
+        'Puede que la película no exista o halla sido eliminada'
+      )
     );
   }
   const {
@@ -107,7 +112,7 @@ exports.crearPelicula = recibirAsinc(async (req, res, next) => {
     return next(
       new AppError(
         400,
-        'Prueba con un nombre,nacionalidad,imagen,genero o edad valido'
+        'Prueba con un titulo, puntuacion, duracion o genero valido'
       )
     );
   }
@@ -118,7 +123,7 @@ exports.crearPelicula = recibirAsinc(async (req, res, next) => {
 
   const imagenCargada = await uploadBytes(imagenRef, req.file.buffer);
 
-  const nuevaPelicula = Pelicula.create({
+  await Pelicula.create({
     titulo,
     imagen: imagenCargada.metadata.fullPath,
     puntuacion,
@@ -126,8 +131,9 @@ exports.crearPelicula = recibirAsinc(async (req, res, next) => {
     duracion,
     genero
   });
+  const nuevaPelicula = await Pelicula.findOne({ whrere: { titulo } });
   res.status(201).json({
-    status: 'Actor creado',
+    status: 'Pelicula creada',
     data: { nuevaPelicula }
   });
 });
@@ -136,9 +142,8 @@ exports.modificarPelicula = recibirAsinc(async (req, res, next) => {
   const { id } = req.params;
   const { titulo, puntuacion, resena, duracion, genero } = req.body;
 
-  const peliculaModificada = { titulo, puntuacion, resena, duracion, genero };
-
   const pelicula = await Pelicula.findOne({ whrere: { status: 'activo', id } });
+
   if (!pelicula) {
     res.status(400).json({
       status: 'Error',
@@ -146,10 +151,26 @@ exports.modificarPelicula = recibirAsinc(async (req, res, next) => {
     });
   }
 
+  const extencionArchivo = req.file.originalname.split('.')[1];
+
+  const imagenRef = ref(storage, `imgs/${Date.now()}-${extencionArchivo}`);
+
+  const imagenCargada = await uploadBytes(imagenRef, req.file.buffer);
+
+  const peliculaModificada = {
+    titulo,
+    puntuacion,
+    imagen: imagenCargada.metadata.fullPath,
+    resena,
+    duracion,
+    genero
+  };
+
   await pelicula.update({ ...peliculaModificada });
   res.status(200).json({
     status: 'Operación exitosa',
-    message: 'La película fue modificado exitosamente'
+    message: 'La película fue modificada exitosamente',
+    data: { peliculaModificada }
   });
 });
 
@@ -171,6 +192,6 @@ exports.eliminarPelicula = recibirAsinc(async (req, res, next) => {
 
   res.status(200).json({
     status: 'Operación exitosa',
-    message: 'La pelicula fue eliminado exitosamente'
+    message: 'La pelicula fue eliminada exitosamente'
   });
 });

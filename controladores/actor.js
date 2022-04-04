@@ -14,6 +14,7 @@ exports.obtenerActores = recibirAsinc(async (req, res, next) => {
 
   const actoresPromesa = actores.map(
     async ({
+      id,
       nombre,
       nacionalidad,
       imagen,
@@ -27,6 +28,7 @@ exports.obtenerActores = recibirAsinc(async (req, res, next) => {
       const direccionUrlImagen = await getDownloadURL(imagenRef);
 
       return {
+        id,
         nombre,
         nacionalidad,
         imagen: direccionUrlImagen,
@@ -52,6 +54,11 @@ exports.obtenerActorUnico = recibirAsinc(async (req, res, next) => {
     where: { status: 'activo', id },
     include: [{ model: Pelicula, through: ActorEnPeli }]
   });
+  if (!actor) {
+    return next(
+      new AppError(400, 'Puede que el usuario no exista o halla sido eliminado')
+    );
+  }
   const {
     nombre,
     nacionalidad,
@@ -104,13 +111,14 @@ exports.crearActor = recibirAsinc(async (req, res, next) => {
 
   const imagenCargada = await uploadBytes(imagenRef, req.file.buffer);
 
-  const nuevoActor = Actor.create({
+  await Actor.create({
     nombre,
     nacionalidad,
     imagen: imagenCargada.metadata.fullPath,
     genero,
     edad
   });
+  const nuevoActor = await Actor.findOne({ where: { nombre } });
   res.status(201).json({
     status: 'Actor creado',
     data: { nuevoActor }
@@ -119,8 +127,7 @@ exports.crearActor = recibirAsinc(async (req, res, next) => {
 
 exports.modificarActor = recibirAsinc(async (req, res, next) => {
   const { id } = req.params;
-  const { nombre, nacionalidad, imagen, genero, edad } = req.body;
-  const actorModificado = { nombre, nacionalidad, imagen, genero, edad };
+  const { nombre, nacionalidad, genero, edad } = req.body;
 
   const actor = await Actor.findOne({ whrere: { status: 'activo', id } });
   if (!actor) {
@@ -129,6 +136,19 @@ exports.modificarActor = recibirAsinc(async (req, res, next) => {
       message: 'El actor no se encuentra en la base de datos'
     });
   }
+  const extencionArchivo = req.file.originalname.split('.')[1];
+
+  const imagenRef = ref(storage, `imgs/${Date.now()}-${extencionArchivo}`);
+
+  const imagenCargada = await uploadBytes(imagenRef, req.file.buffer);
+
+  const actorModificado = {
+    nombre,
+    nacionalidad,
+    imagen: imagenCargada.metadata.fullPath,
+    genero,
+    edad
+  };
 
   await actor.update({ ...actorModificado });
   res.status(200).json({

@@ -10,8 +10,9 @@ const { storage } = require('../utilidades/firebase');
 exports.obtenerComentarios = recibirAsinc(async (req, res, next) => {
   const comentarios = await Comentario.findAll({
     where: { status: 'activo' },
-    include: [{ model: Pelicula, through: ActorEnPeli }, { model: Usuario }]
+    include: [{ model: Pelicula }, { model: Usuario }]
   });
+
   res.status(200).json({
     status: 'operación exitosa',
     data: comentarios
@@ -22,12 +23,15 @@ exports.obtenerComentarioUnico = recibirAsinc(async (req, res, next) => {
   const { id } = req.params;
   const comentarioUnico = await Comentario.findOne({
     where: { status: 'activo', id },
-    include: [{ model: Pelicula, through: ActorEnPeli }, { model: Usuario }]
+    include: [{ model: Pelicula }, { model: Usuario }]
   });
 
-  if (!actor) {
+  if (!comentarioUnico) {
     return next(
-      new AppError(400, 'Puede que el usuario no exista o halla sido eliminado')
+      new AppError(
+        400,
+        'Puede que el comentario no exista o halla sido eliminado'
+      )
     );
   }
   res.status(200).json({
@@ -37,8 +41,11 @@ exports.obtenerComentarioUnico = recibirAsinc(async (req, res, next) => {
 });
 
 exports.crearComentario = recibirAsinc(async (req, res, next) => {
-  const { titulo, puntuacion, comentario, usuarioId, peliculaId } = req.body;
-  if (!titulo || !puntuacion || !comentario || !usuarioId || !peliculaId) {
+  const { titulo, puntuacion, comentario, peliculaId } = req.body;
+
+  const { id } = req.usuarioActual;
+  console.log(titulo, puntuacion, comentario, peliculaId);
+  if (!titulo || !puntuacion || !comentario || !peliculaId) {
     return next(
       new AppError(
         400,
@@ -47,32 +54,37 @@ exports.crearComentario = recibirAsinc(async (req, res, next) => {
     );
   }
 
-  const nuevoComentario = Comentario.create({
+  const nuevoComentario = await Comentario.create({
     titulo,
     puntuacion,
     comentario,
-    usuarioId,
+    usuarioId: id,
     peliculaId
   });
   res.status(201).json({
     status: 'Comentario creado',
-    data:  nuevoComentario 
+    data: nuevoComentario
   });
 });
 
 exports.modificarComentario = recibirAsinc(async (req, res, next) => {
   const { id } = req.params;
   const { titulo, puntuacion, comentario } = req.body;
-  const comentarioModificado = { titulo, puntuacion, comentario  };
+  const comentarioModificado = { titulo, puntuacion, comentario };
 
-  const comentarioHecho = await Comentario.findOne({ whrere: { status: 'activo', id } });
-  if (!comentario) {
+  const comentarioHecho = await Comentario.findOne({
+    whrere: { status: 'activo', id }
+  });
+
+  if (!comentarioHecho) {
     res.status(400).json({
       status: 'Error',
       message: 'El comentario no se encuentra en la base de datos'
     });
   }
-
+  if (comentarioHecho.usuarioId !== req.usuarioActual.id) {
+    return next(new AppError(400, 'No puedes modificar este comentario'));
+  }
   await comentarioHecho.update({ ...comentarioModificado });
   res.status(200).json({
     status: 'Operación exitosa',
@@ -93,7 +105,9 @@ exports.eliminarComentario = recibirAsinc(async (req, res, next) => {
       message: 'El comentario no existe en la base de datos'
     });
   }
-
+  if (comentarioAEliminar.usuarioId !== req.usuarioActual.id) {
+    return next(new AppError(400, 'No puedes eliminar este comentario'));
+  }
   await comentarioAEliminar.update({ status: 'eliminado' });
 
   res.status(200).json({

@@ -11,7 +11,8 @@ dotenv.config({ path: './config.env' });
 exports.obtenerUsuarios = recibirAsinc(async (req, res, next) => {
   const usuarios = await Usuario.findAll({
     where: { status: 'activo' },
-    attributes: { exclude: ['contrasena'] },include:{model: Comentario}
+    attributes: { exclude: ['contrasena'] },
+    include: { model: Comentario }
   });
 
   res.status(200).json({
@@ -24,7 +25,8 @@ exports.obtenerUsuarioUnico = recibirAsinc(async (req, res, next) => {
   const { id } = req.params;
   const usuario = await Usuario.findOne({
     where: { status: 'activo', id },
-    attributes: { exclude: ['contrasena'] },include:{model: Comentario}
+    attributes: { exclude: ['contrasena'] },
+    include: { model: Comentario }
   });
   if (!usuario) {
     return next(
